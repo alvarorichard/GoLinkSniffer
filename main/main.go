@@ -9,11 +9,6 @@ import (
 	"time"
 )
 
-var (
-	//links   []string
-	visited = make(map[string]bool)
-)
-
 type VisitedLink struct {
 	Website     string    `bson:"website"`
 	Link        string    `bson:"link"`
@@ -27,13 +22,7 @@ func main() {
 
 func visitLink(link string) {
 
-	if ok := visited[link]; ok {
-		return
-	}
-
-	visited[link] = true
-
-	fmt.Println("Acessando o site", link)
+	fmt.Printf("Acessando o site: %s\n", link)
 
 	resp, err := http.Get(link)
 
@@ -61,6 +50,10 @@ func extractLinks(node *html.Node) {
 			}
 			link, err := url.Parse(attr.Val)
 			if err != nil || link.Scheme == "" {
+				continue
+			}
+			if db.VistedLink(link.String()) {
+				fmt.Printf("Link já visitado:%s\n ", link.String())
 				continue
 			}
 			VisitedLink := VisitedLink{
