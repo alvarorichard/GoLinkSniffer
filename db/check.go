@@ -12,7 +12,7 @@ func VistedLink(link string) bool {
 
 	c := client.Database("gocrawler").Collection("links")
 
-	opts := options.Count().SetMaxTime(1)
+	opts := options.Count().SetLimit(1)
 
 	n, err := c.CountDocuments(
 		context.TODO(),
