@@ -36,18 +36,21 @@ func visitLink(link string) {
 	fmt.Printf("Acessando o site: %s\n", link)
 
 	resp, err := http.Get(link)
-
 	if err != nil {
-		panic(err)
+		fmt.Println("Error:", err)
+		return
 	}
 	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		panic(fmt.Sprintf("Erro ao acessar o site %s. Status code: %d", resp.StatusCode))
 
+	if resp.StatusCode != http.StatusOK {
+		fmt.Printf("Erro ao acessar o site %s. Status code: %d\n", link, resp.StatusCode)
+		return
 	}
+
 	doc, err := html.Parse(resp.Body)
 	if err != nil {
-		panic(err)
+		fmt.Println("Error:", err)
+		return
 	}
 
 	extractLinks(doc)
