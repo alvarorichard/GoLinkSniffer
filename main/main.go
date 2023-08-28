@@ -1,21 +1,28 @@
 package main
 
 import (
+	"_GoLinkSniffer/db"
 	"fmt"
 	"golang.org/x/net/html"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 var (
-	links   []string
+	//links   []string
 	visited = make(map[string]bool)
 )
+
+type VisitedLink struct {
+	Website     string    `bson:"website"`
+	Link        string    `bson:"link"`
+	VisitedDate time.Time `bson:"visited_date"`
+}
 
 func main() {
 	visitLink("https://aprendagolang.com.br/")
 
-	fmt.Println(len(links))
 }
 
 func visitLink(link string) {
@@ -56,7 +63,12 @@ func extractLinks(node *html.Node) {
 			if err != nil || link.Scheme == "" {
 				continue
 			}
-			links = append(links, link.String())
+			VisitedLink := VisitedLink{
+				Website:     link.Host,
+				Link:        link.String(),
+				VisitedDate: time.Now(),
+			}
+			db.Insert("links", VisitedLink)
 			visitLink(link.String())
 		}
 	}
