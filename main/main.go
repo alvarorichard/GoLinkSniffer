@@ -2,6 +2,7 @@ package main
 
 import (
 	"_GoLinkSniffer/db"
+	"flag"
 	"fmt"
 	"golang.org/x/net/html"
 	"net/http"
@@ -15,9 +16,19 @@ type VisitedLink struct {
 	VisitedDate time.Time `bson:"visited_date"`
 }
 
-func main() {
-	visitLink("https://aprendagolang.com.br/")
+var link string
 
+func init() {
+	flag.StringVar(&link, "url", "https://aprendagolang.com.br/", "Link para ser visitado)")
+}
+
+func main() {
+	flag.Parse()
+
+	done := make(chan bool)
+	go visitLink(link)
+
+	<-done
 }
 
 func visitLink(link string) {
@@ -49,7 +60,7 @@ func extractLinks(node *html.Node) {
 				continue
 			}
 			link, err := url.Parse(attr.Val)
-			if err != nil || link.Scheme == "" {
+			if err != nil || link.Scheme == "" || link.Scheme == "mailto" {
 				continue
 			}
 			if db.VistedLink(link.String()) {
@@ -62,7 +73,7 @@ func extractLinks(node *html.Node) {
 				VisitedDate: time.Now(),
 			}
 			db.Insert("links", VisitedLink)
-			visitLink(link.String())
+			go visitLink(link.String())
 		}
 	}
 
