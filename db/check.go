@@ -6,7 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func VistedLink(link string) bool {
+func VistedLink(link string) (bool, error) {
 	client, ctx := getConnection()
 	defer client.Disconnect(ctx)
 
@@ -20,8 +20,8 @@ func VistedLink(link string) bool {
 		opts,
 	)
 	if err != nil {
-		panic(err)
+		return true, err
 	}
-	return n > 0
+	return n > 0, nil
 
 }

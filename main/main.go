@@ -66,7 +66,14 @@ func extractLinks(node *html.Node) {
 			if err != nil || link.Scheme == "" || link.Scheme == "mailto" {
 				continue
 			}
-			if db.VistedLink(link.String()) {
+
+			visitado, err := db.VistedLink(link.String())
+			if err != nil {
+				fmt.Println("Error:", err)
+				continue
+
+			}
+			if visitado {
 				fmt.Printf("Link já visitado:%s\n ", link.String())
 				continue
 			}
